@@ -1,23 +1,16 @@
-# !!! PLEASE READ THE FOLLOWING BEFORE USING !!!
-
-'''
-    This application has NOT been fully tested.
-    There will be inevitable bugs; the code is NOT perfect.
-    This application has been abandoned in an INCOMPLETE state.
-    Exceptions are incredibly common, and left-over debugging code has NOT been removed.
-    If you are OK with this fact, you may continue to use this software at your own expense.
-    Thank you for reading.
-'''
-
 import os, aiohttp, asyncio, socket, urllib, html.parser, json, jsonpickle
+import cloudscraper
+
+scraper = cloudscraper.create_scraper()
 
 jsonpickle.set_preferred_backend('json')
 #jsonpickle.set_encoder_options('json', ensure_ascii=False)
 
 current_circles = []
 
-debug_waits = True
-debug_prints = True
+debug_waits = True # Waits for User-Input for certain Major Errors
+debug_prints = True # Prints Extra Debug Information
+debug_gets = True # Prints the Text Output to Console for every Web Request (Outputs a LOT of text)
 
 class Circle(object):
     name = None
@@ -66,9 +59,24 @@ async def get_aio_connector():
     return conn
 
 async def get(url):
-    async with aiohttp.ClientSession(connector=await get_aio_connector()) as session:
-        async with session.get(url) as resp:
-            return await resp.text()
+    global scraper
+
+    while True:
+        #async with aiohttp.ClientSession(connector=await get_aio_connector()) as session:
+            #async with session.get(url) as resp:
+                #return await resp.text()
+        text = scraper.get(url).text
+        if 'Cloudflare' in text:
+            print("Killed by Cloudflare Anti-Spam. Waiting 5 Minutes...")
+            await asyncio.sleep(300)
+            
+            del scraper # Free Old Scraper
+            scraper = cloudscraper.create_scraper() # Create New Scraper
+        else:
+            if debug_gets:
+                print(text)
+            break
+    return text
 
 async def populate_circles():
     global current_circles
@@ -121,16 +129,22 @@ async def populate_circles():
                 circle_has_content = False
                 current_circle = Circle()
                 if debug_prints:
-                    print("Circle: " + circle)
+                    print("Circle: '" + circle + "'")
                 else:
                     print("Got Circle")
                 current_circle.name = circle
                 if not circle_link == None:
                     if debug_prints:
-                        print("Circle Link: " + circle_link)
+                        print("Circle Link: '" + circle_link + "'")
                     current_circle.link = circle_link
             else:
                 print('Invalid Double-Circle Circle "' + circle + '"')
+                valid_circle = False
+                if debug_waits:
+                    input()
+
+            if circle == "" or circle == None:
+                print("Blank Circle!")
                 valid_circle = False
                 if debug_waits:
                     input()
@@ -181,7 +195,10 @@ async def populate_circles():
                             new_albums = 0
                             circle_albums = circle_albums[circle_albums.index('id="Discography"') + 16:]
                             #circle_albums = circle_albums[:circle_albums.index('</table>')] # Or '</tbody>'
-                            circle_albums = circle_albums[:circle_albums.index('<!-- \nNewPP limit report')]
+                            try:
+                                circle_albums = circle_albums[:circle_albums.index('<!-- \nNewPP limit report')] # Maybe Re-enable This?
+                            except:
+                                pass
                             if '<a href="' in circle_albums:
                                 if '<img' in circle_albums:
                                     images = True
