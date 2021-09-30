@@ -2,7 +2,7 @@
 
 A Touhou Wiki Arrange Parser & HTML Arrange Database Builder written in Python 3.
 
-View the 'List by Song' HTML File Structure in the original HTML form [here](https://epicfisher.github.io/TouhouWikiArrangeParser/root/)!
+View the 'List by Song' HTML File Structure in the original HTML form [here!](https://epicfisher.github.io/TouhouWikiArrangeParser/root/)
 
 ## Features
 
