@@ -4,6 +4,8 @@ A Touhou Wiki Arrange Parser & HTML Arrange Database Builder written in Python 3
 
 View the 'List by Song' HTML File Structure in the original HTML form [Here!](https://epicfisher.github.io/touhou-wiki-arrange-parser/root/)
 
+> This repo is used in my [Touhou Discord Bot](https://github.com/Epicfisher/TouhouDiscordBot) to provide Music Functionality!
+
 ## Features
 
 * Parses https://en.touhouwiki.net/wiki/List_by_Groups to return a list of all Touhou Circles, Albums and their Arranged Tracks as a JSON file
